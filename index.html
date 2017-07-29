@@ -24,7 +24,7 @@
           setTimeout(function(){ init(url) }, 1000);
         };
 
-        ws.onmessage = function(evt) {
+        ws.onmessage = function(event) {
           console.log(event.data);
           var msg = JSON.parse(event.data);
 
