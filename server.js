@@ -19,10 +19,10 @@ stompit.connect({ host: 'broker-amq-stomp', port: 61613, connectHeaders:{
     'host': '/', login: process.env.AMQ_USER , passcode: process.env.AMQ_PASSWORD }}, (err, stompclient) => {
   console.log(err);
   stompclient.subscribe(topic, (err, msg) => {
-    //msg.readString('UTF-8', (err, body) => {
-      console.log('sending: %s', msg);
-      wss.clients.forEach((websocketclient) => { websocketclient.send(msg); });
-    //});
+    msg.readString('UTF-8', (err, body) => {
+      console.log('sending: %s', body);
+      wss.clients.forEach((websocketclient) => { websocketclient.send(body); });
+    });
   });
 
   wss.on('connection', (ws) => {
