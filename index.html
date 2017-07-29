@@ -1,0 +1,43 @@
+
+<html>
+  <head><title>Click Me</title></head>
+  <body style="margin: 0px; padding: 0px;">
+    <canvas id="myCanvas" style=""></canvas>
+    <script>
+      var canvas = document.getElementById('myCanvas');
+      var context = canvas.getContext('2d');
+      canvas.width = document.body.clientWidth;
+      canvas.height = document.body.clientHeight;
+
+      function init(url){
+        ws = new WebSocket(url);
+
+        //send coordinates to server on click/tap
+        function click(e) {
+          ws.send(JSON.stringify({ x: e.clientX, y: e.clientY }));
+        }
+        canvas.addEventListener("mouseup", click, false);
+
+        //reconnect to server upon connection loss
+        ws.onclose = function(){
+          canvas.removeEventListener("mouseup", click, false);
+          setTimeout(function(){ init(url) }, 1000);
+        };
+
+        ws.onmessage = function(evt) {
+          console.log(event.data);
+          var msg = JSON.parse(event.data);
+
+          context.beginPath();
+          context.arc(msg.x, msg.y, msg.radius, 0, 2 * Math.PI, false);
+          context.fillStyle = msg.color;
+          context.fill();
+          context.lineWidth = 3;
+          context.strokeStyle = '#003300';
+          context.stroke();
+        };
+      }
+      init("ws:/")
+    </script>
+  </body>
+</html>
