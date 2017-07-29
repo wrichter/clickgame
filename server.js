@@ -15,7 +15,7 @@ const stompit = require('stompit');
 const topic = { destination: '/topic/SampleTopic' };
 const wss = new SocketServer({ server });
 
-stompit.connect({ host: 'broker-amq-stomp', port: 61613 }, (err, stompclient) => {
+stompit.connect({ host: 'broker-amq-stomp', port: 61613, login: process.env.AMQ_USER , passcode: process.env.AMQ_PASSWORD }, (err, stompclient) => {
   console.log(err);
   stompclient.subscribe(topic, (err, msg) => {
     //msg.readString('UTF-8', (err, body) => {
