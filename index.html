@@ -29,15 +29,15 @@
           var msg = JSON.parse(event.data);
 
           context.beginPath();
-          context.arc(msg.x, msg.y, msg.radius, 0, 2 * Math.PI, false);
-          context.fillStyle = msg.color;
+          context.arc(msg.x, msg.y, msg.radius || 20, 0, 2 * Math.PI, false);
+          context.fillStyle = msg.color || 'green';
           context.fill();
           context.lineWidth = 3;
           context.strokeStyle = '#003300';
           context.stroke();
         };
       }
-      init("ws:/")
+      init('ws://' + window.location.host + '/')
     </script>
   </body>
 </html>
