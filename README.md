@@ -11,7 +11,7 @@ $ oc process -f clickgame.yaml | oc create -f -
 * **public/index.html** is the static HTML page being served
 
 ## Adjust client (index.html)
-Executing these changes will yield [result/index.html](result/index.html)
+Executing these changes will yield [result/index.html](result/index.html).
 
 1. Replace the &lt;h1> element with the following snippet. This creates a canvas that can be used to draw on and opens a web socket back to the server:
 ```
@@ -35,7 +35,7 @@ Executing these changes will yield [result/index.html](result/index.html)
 </script>
 ```
 
-2. Send click coordinates to the server (add directly below ```ws = new WebSocket(url);```):
+2. Send click coordinates to the server (add directly below ```ws = new WebSocket(url);``` ):
 ```
 //send coordinates to server on click/tap
 function click(e) {
@@ -80,6 +80,7 @@ ws.onopen = function() {
 ```
 
 ## Adjust server (server.js)
+Executing these changes will yield [result/server.js](result/server.js).
 
 1. Create websocket server and stomp connection to message broker (add after existing code):
 ```
@@ -104,7 +105,7 @@ stompit.connect(stompconnection, (err, stompclient) => {
 });
 ```
 
-2. Subscribe to topic and forward all publications to websocket clients (below ```// additional code here```)
+2. Subscribe to topic and forward all publications to websocket clients (below ```// additional code here``` ):
 ```
 //subscribe to topic and send to all websocket clients
 stompclient.subscribe(topic, (err, msg) => {
@@ -147,15 +148,15 @@ $ oc start-build clickgame-green --from-dir=.
 2. Demonstrate the created application - all users should be able to jointly create green circles by clicking on the canvas.
 
 ## Build 'blue' application & adjust route
-1. Adjust the message to be published (under ```//adjust message here```):
+1. Adjust the message to be published (under ```//adjust message here``` ):
 ```
 var o = JSON.parse(msg);
 o.color = 'blue';
 msg = JSON.stringify(o);
 ```
-2. Build 'blue' application from current source code
+2. Build 'blue' application from current source code:
 ```
 $ oc start-build clickgame-blue --from-dir=.
 ```
-3. Change route weights via UI to 50% green/50% blue
-4. Continue creating circles, 50% should now be green and 50% should be blue
+3. Change route weights via UI to 50% green/50% blue.
+4. Continue creating circles, 50% should now be green and 50% should be blue.
