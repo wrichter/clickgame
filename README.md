@@ -30,12 +30,14 @@ Executing these changes will yield [result/index.html](result/index.html).
     statusline.innerHTML = "connecting..."
     ws = new WebSocket(url);
 
+    // additional code here
   }
   init('ws://' + window.location.host + '/')
 </script>
 ```
 
-2. Send click coordinates to the server (add directly below ```ws = new WebSocket(url);``` ):
+2. Send click coordinates to the server (add directly below ```// additional code here
+``` ):
 ```
 //send coordinates to server on click/tap
 function click(e) {
@@ -160,13 +162,18 @@ msg = JSON.stringify(o);
 $ oc start-build clickgame-blue --from-dir=.
 ```
 
-3. Change route weights to 50% green/50% blue:
+3. Switch from 'green' to 'blue':
 ```
-$ oc patch route clickgame -p \
-'{"spec":{"to":{"weight":50},"alternateBackends":[{"name":"clickgame-blue","weight":50}]}}'
+$ oc patch route clickgame -p '{"spec":{"to":{"name":"clickgame-blue","weight":50}}}'
 ```
 
-4. Continue creating circles, 50% should now be green and 50% should be blue.
+4. Change route weights to 50% green/50% blue:
+```
+$ oc patch route clickgame -p \
+'{"spec":{"to":{"name":"clickgame-green","weight":50},"alternateBackends":[{"name":"clickgame-blue","weight":50,"kind":"Service"}]}}'
+```
+
+5. Continue creating circles, 50% should now be green and 50% should be blue.
 
 ## Reset Demo
 1. ```git checkout public/index.html server.js```
