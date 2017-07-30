@@ -154,9 +154,19 @@ var o = JSON.parse(msg);
 o.color = 'blue';
 msg = JSON.stringify(o);
 ```
+
 2. Build 'blue' application from current source code:
 ```
 $ oc start-build clickgame-blue --from-dir=.
 ```
-3. Change route weights via UI to 50% green/50% blue.
+
+3. Change route weights to 50% green/50% blue:
+```
+oc patch route clickgame -p '{"spec":{"to":{"weight":50},"alternateBackends":[{"name":"clickgame-blue","weight":50}]}}'
+```
+
 4. Continue creating circles, 50% should now be green and 50% should be blue.
+
+## Reset Demo
+1. ```git checkout public/index.html server.js```
+2. ```oc delete all,templates --all```
