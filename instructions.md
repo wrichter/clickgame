@@ -1,9 +1,19 @@
---- CLIENT ---
+# Instructions
 
--1-
-<div id="status"></div>
-<canvas id="canvas"></canvas>
-<script>
+## Instantiate clickgame in namespace
+    $ oc new-project clickgame
+    $ oc process -f clickgame.yaml | oc create -f -
+
+## Demonstrate App structure
+* **server.js** is a simple express application to serve static content
+* **public/index.html** is the static HTML page being served
+
+## Adjust client (index.html)
+1. Replace the &lt;h1> element with the following snippet:
+
+```&lt;div id="status">&lt;/div>
+&lt;canvas id="canvas">&lt;/canvas>
+&lt;script>
   var statusline = document.getElementById('status');
   var numconnections = 0;
 
@@ -18,7 +28,7 @@
 
   }
   init('ws://' + window.location.host + '/')
-</script>
+&lt;/script>```
 
 -2-
 //send coordinates to server on click/tap
