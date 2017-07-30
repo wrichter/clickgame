@@ -1,8 +1,10 @@
 # Instructions
 
 ## Instantiate clickgame in namespace
-    $ oc new-project clickgame
-    $ oc process -f clickgame.yaml | oc create -f -
+```
+$ oc new-project clickgame
+$ oc process -f clickgame.yaml | oc create -f -
+```
 
 ## Demonstrate App structure
 * **server.js** is a simple express application to serve static content
@@ -77,8 +79,10 @@ ws.onopen = function() {
 }
 ```
 
---- SERVER ---
--1-
+## Adjust server (server.js)
+
+1. Create websocket server and stomp connection to message broker (add after existing code):
+```
 const SocketServer = require('ws').Server;
 const wss = new SocketServer({ server });
 
@@ -98,9 +102,10 @@ stompit.connect(stompconnection, (err, stompclient) => {
 
   // additional code here
 });
+```
 
-
--2-
+2. Subscribe to topic and forward all publications to websocket clients (below ```// additional code here```)
+```
 //subscribe to topic and send to all websocket clients
 stompclient.subscribe(topic, (err, msg) => {
   msg.readString('UTF-8', (err, body) => {
@@ -108,31 +113,49 @@ stompclient.subscribe(topic, (err, msg) => {
     wss.clients.forEach((websocketclient) => { websocketclient.send(body); });
   });
 });
+```
 
--3-
+3. Publish messages from websocket to topic:
+```
 //publish new messages from websocket to topic
 wss.on('connection', (ws) => {
   console.log('Client connected');
   ws.on('close', () => console.log('Client disconnected'));
   ws.on('message', function incoming(msg) {
     console.log('received: %s', msg);
-
     // adjust message here
-
     const frame = stompclient.send(topic);
     frame.write(msg);
     frame.end();
   });
 });
+```
 
-
--4-
+4. Ensure cleanup on exit:
+```
 //cleanup on exit
 process.on('exit', function () { //on 'SIGTERM'
   stompclient.disconnect();
 });
+```
 
--5-
+## Rebuild & demonstrate 'green' application
+1. Rebuild 'green' application from current source code:
+```
+$ oc start-build clickgame-green --from-dir=.
+```
+2. Demonstrate the created application - all users should be able to jointly create green circles by clicking on the canvas.
+
+## Build 'blue' application & adjust route
+1. Adjust the message to be published (under ```//adjust message here```):
+```
 var o = JSON.parse(msg);
 o.color = 'blue';
 msg = JSON.stringify(o);
+```
+2. Build 'blue' application from current source code
+```
+$ oc start-build clickgame-blue --from-dir=.
+```
+3. Change route weights via UI to 50% green/50% blue
+4. Continue creating circles, 50% should now be green and 50% should be blue
