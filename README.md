@@ -142,11 +142,11 @@ process.on('exit', function () { //on 'SIGTERM'
 ```
 
 ## Rebuild & demonstrate 'blue' application
-1. Rebuild 'green' application from current source code:
+1. Rebuild 'blue' application from current source code:
 ```
 $ oc start-build clickgame-blue --from-dir=.
 ```
-2. Demonstrate the created application - all users should be able to jointly create green circles by clicking on the canvas.
+2. Demonstrate the created application - all users should be able to jointly create blue circles by clicking on the canvas.
 
 ## Build 'green' application & adjust route
 1. Adjust the message to be published (under ```//adjust message here``` ):
@@ -169,7 +169,8 @@ $ oc patch route clickgame -p '{"spec":{"to":{"name":"clickgame-green"}}}'
 4. Change route weights to 50% blue/50% green:
 ```
 $ oc patch route clickgame -p \
-'{"spec":{"to":{"name":"clickgame-blue","weight":50},"alternateBackends":[{"name":"clickgame-green","weight":50,"kind":"Service"}]}}'
+'{"spec":{"to":{"name":"clickgame-blue","weight":50},
+"alternateBackends":[{"name":"clickgame-green","weight":50,"kind":"Service"}]}}'
 ```
 
 5. Continue creating circles, 50% should now be blue and 50% should be green.
