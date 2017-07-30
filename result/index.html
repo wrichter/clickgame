@@ -1,0 +1,60 @@
+<html>
+  <head>
+    <link rel="stylesheet" href="style.css" />
+    <title>Click Me</title>
+  </head>
+  <body>
+    <div id="status"></div>
+    <canvas id="canvas"></canvas>
+    <script>
+      var statusline = document.getElementById('status');
+      var numconnections = 0;
+
+      var canvas = document.getElementById('canvas');
+      canvas.width = document.body.clientWidth;
+      canvas.height = document.body.clientHeight;
+      var context = canvas.getContext('2d');
+
+      function init(url){
+        statusline.innerHTML = "connecting..."
+        ws = new WebSocket(url);
+
+        //send coordinates to server on click/tap
+        function click(e) {
+          ws.send(JSON.stringify({ x: e.clientX, y: e.clientY }));
+        }
+        canvas.addEventListener("mouseup", click, false);
+
+        //draw circle upon message from server
+        ws.onmessage = function(event) {
+          statusline.innerHTML = 'connection #' + numconnections + ' ' +  event.data
+          var msg = JSON.parse(event.data);
+          context.beginPath();
+          context.arc(msg.x, msg.y, msg.radius || 20, 0, 2 * Math.PI, false);
+          context.fillStyle = msg.color || 'green';
+          context.fill();
+          context.lineWidth = 3;
+          context.strokeStyle = '#003300';
+          context.stroke();
+        };
+
+        //reconnect to server upon connection loss
+        ws.onerror = function(){
+          canvas.removeEventListener("mouseup", click, false);
+          setTimeout(function(){ init(url) }, 1000);
+        };
+
+        //close & reconnect web socket after 10 seconds
+        ws.onopen = function() {
+          statusline.innerHTML = 'connection #' + ++numconnections
+          setTimeout(function() {
+            canvas.removeEventListener("mouseup", click, false);
+            ws.close();
+            init(url);
+          }, 10000)
+        }
+      }
+      init('ws://' + window.location.host + '/')
+    </script>
+  </body>
+</html>
