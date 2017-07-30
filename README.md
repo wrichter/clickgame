@@ -9,11 +9,13 @@
 * **public/index.html** is the static HTML page being served
 
 ## Adjust client (index.html)
-1. Replace the &lt;h1> element with the following snippet:
+Executing these changes will yield [result/index.html](result/index.html)
 
-```&lt;div id="status">&lt;/div>
-&lt;canvas id="canvas">&lt;/canvas>
-&lt;script>
+1. Replace the &lt;h1> element with the following snippet. This creates a canvas that can be used to draw on and opens a web socket back to the server.
+```
+<div id="status"></div>
+<canvas id="canvas"></canvas>
+<script>
   var statusline = document.getElementById('status');
   var numconnections = 0;
 
@@ -28,16 +30,20 @@
 
   }
   init('ws://' + window.location.host + '/')
-&lt;/script>```
+</script>
+```
 
--2-
+2. Send click coordinates to the server (add directly below ```ws = new WebSocket(url);```):
+```
 //send coordinates to server on click/tap
 function click(e) {
   ws.send(JSON.stringify({ x: e.clientX, y: e.clientY }));
 }
 canvas.addEventListener("mouseup", click, false);
+```
 
--3-
+3. When message is received via websocket, draw a circle with the specified coordinates, radius and color:
+```
 //draw circle upon message from server
 ws.onmessage = function(event) {
   statusline.innerHTML = 'connection #' + numconnections + ' ' +  event.data
@@ -50,8 +56,10 @@ ws.onmessage = function(event) {
   context.strokeStyle = '#003300';
   context.stroke();
 };
+```
 
--4-
+4. Ensure websocket is periodically reset and reinitated on error:
+```
 //reconnect to server upon connection loss
 ws.onerror = function(){
   canvas.removeEventListener("mouseup", click, false);
@@ -67,7 +75,7 @@ ws.onopen = function() {
     init(url);
   }, 10000)
 }
-
+```
 
 --- SERVER ---
 -1-
