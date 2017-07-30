@@ -31,7 +31,7 @@
           var msg = JSON.parse(event.data);
           context.beginPath();
           context.arc(msg.x, msg.y, msg.radius || 20, 0, 2 * Math.PI, false);
-          context.fillStyle = msg.color || 'green';
+          context.fillStyle = msg.color || 'blue';
           context.fill();
           context.lineWidth = 3;
           context.strokeStyle = '#003300';

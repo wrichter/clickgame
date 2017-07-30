@@ -36,8 +36,7 @@ Executing these changes will yield [result/index.html](result/index.html).
 </script>
 ```
 
-2. Send click coordinates to the server (add directly below ```// additional code here
-``` ):
+2. Send click coordinates to the server (add directly below ```// additional code here``` ):
 ```
 //send coordinates to server on click/tap
 function click(e) {
@@ -54,7 +53,7 @@ ws.onmessage = function(event) {
   var msg = JSON.parse(event.data);
   context.beginPath();
   context.arc(msg.x, msg.y, msg.radius || 20, 0, 2 * Math.PI, false);
-  context.fillStyle = msg.color || 'green';
+  context.fillStyle = msg.color || 'blue';
   context.fill();
   context.lineWidth = 3;
   context.strokeStyle = '#003300';
@@ -142,38 +141,38 @@ process.on('exit', function () { //on 'SIGTERM'
 });
 ```
 
-## Rebuild & demonstrate 'green' application
+## Rebuild & demonstrate 'blue' application
 1. Rebuild 'green' application from current source code:
-```
-$ oc start-build clickgame-green --from-dir=.
-```
-2. Demonstrate the created application - all users should be able to jointly create green circles by clicking on the canvas.
-
-## Build 'blue' application & adjust route
-1. Adjust the message to be published (under ```//adjust message here``` ):
-```
-var o = JSON.parse(msg);
-o.color = 'blue';
-msg = JSON.stringify(o);
-```
-
-2. Build 'blue' application from current source code:
 ```
 $ oc start-build clickgame-blue --from-dir=.
 ```
+2. Demonstrate the created application - all users should be able to jointly create green circles by clicking on the canvas.
 
-3. Switch from 'green' to 'blue':
+## Build 'green' application & adjust route
+1. Adjust the message to be published (under ```//adjust message here``` ):
 ```
-$ oc patch route clickgame -p '{"spec":{"to":{"name":"clickgame-blue","weight":50}}}'
+var o = JSON.parse(msg);
+o.color = 'green';
+msg = JSON.stringify(o);
 ```
 
-4. Change route weights to 50% green/50% blue:
+2. Build 'green' application from current source code:
+```
+$ oc start-build clickgame-green --from-dir=.
+```
+
+3. Switch from 'blue' to 'green':
+```
+$ oc patch route clickgame -p '{"spec":{"to":{"name":"clickgame-green"}}}'
+```
+
+4. Change route weights to 50% blue/50% green:
 ```
 $ oc patch route clickgame -p \
-'{"spec":{"to":{"name":"clickgame-green","weight":50},"alternateBackends":[{"name":"clickgame-blue","weight":50,"kind":"Service"}]}}'
+'{"spec":{"to":{"name":"clickgame-blue","weight":50},"alternateBackends":[{"name":"clickgame-green","weight":50,"kind":"Service"}]}}'
 ```
 
-5. Continue creating circles, 50% should now be green and 50% should be blue.
+5. Continue creating circles, 50% should now be blue and 50% should be green.
 
 ## Reset Demo
 1. ```git checkout public/index.html server.js```

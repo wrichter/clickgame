@@ -20,13 +20,13 @@ objects:
     creationTimestamp: null
     labels:
       app: ${NAME}
-    name: ${NAME}-green
+    name: ${NAME}-blue
   spec:
     nodeSelector: null
     output:
       to:
         kind: ImageStreamTag
-        name: ${NAME}:green
+        name: ${NAME}:blue
     postCommit: {}
     resources: {}
     runPolicy: Serial
@@ -60,13 +60,13 @@ objects:
     creationTimestamp: null
     labels:
       app: ${NAME}
-    name: ${NAME}-blue
+    name: ${NAME}-green
   spec:
     nodeSelector: null
     output:
       to:
         kind: ImageStreamTag
-        name: ${NAME}:blue
+        name: ${NAME}:green
     postCommit: {}
     resources: {}
     runPolicy: Serial
@@ -390,7 +390,7 @@ objects:
       targetPort: 8080-tcp
     to:
       kind: Service
-      name: clickgame-green
+      name: clickgame-blue
     wildcardPolicy: None
 parameters:
 - description: The name assigned to all of the frontend objects defined in this template.

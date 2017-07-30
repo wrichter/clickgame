@@ -40,7 +40,7 @@ stompit.connect(stompconnection, (err, stompclient) => {
 
       // adjust message here
       var o = JSON.parse(msg);
-      o.color = 'blue';
+      o.color = 'green';
       msg = JSON.stringify(o);
 
       const frame = stompclient.send(topic);
