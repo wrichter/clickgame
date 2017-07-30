@@ -11,7 +11,8 @@
 ## Adjust client (index.html)
 Executing these changes will yield [result/index.html](result/index.html)
 
-1. Replace the &lt;h1> element with the following snippet. This creates a canvas that can be used to draw on and opens a web socket back to the server:```
+1. Replace the &lt;h1> element with the following snippet. This creates a canvas that can be used to draw on and opens a web socket back to the server:
+```
 <div id="status"></div>
 <canvas id="canvas"></canvas>
 <script>
