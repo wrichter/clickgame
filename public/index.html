@@ -5,5 +5,28 @@
   </head>
   <body>
     <h1>Hello from OpenShift!</h1>
+    <div id="status"></div>
+    <canvas id="canvas"></canvas>
+    <script>
+      var statusline = document.getElementById('status');
+      var numconns = 0;
+      var reconnecttimeout;
+
+      var canvas = document.getElementById('canvas');
+      canvas.width = document.body.clientWidth;
+      canvas.height = document.body.clientHeight;
+      var context = canvas.getContext('2d');
+
+      function circle(x,y,radius,color) {
+        context.beginPath();
+        context.arc(x, y, radius, 0, 2 * Math.PI, false);
+        context.fillStyle = color;
+        context.fill();
+        context.lineWidth = 3;
+        context.strokeStyle = '#003300';
+        context.stroke();
+      }
+
+    </script>
   </body>
 </html>

@@ -8,53 +8,65 @@
     <canvas id="canvas"></canvas>
     <script>
       var statusline = document.getElementById('status');
-      var numconnections = 0;
+      var numconns = 0;
+      var reconnecttimeout;
 
       var canvas = document.getElementById('canvas');
       canvas.width = document.body.clientWidth;
       canvas.height = document.body.clientHeight;
       var context = canvas.getContext('2d');
 
-      function init(url){
+      function circle(x,y,radius,color) {
+        context.beginPath();
+        context.arc(x, y, radius, 0, 2 * Math.PI, false);
+        context.fillStyle = color;
+        context.fill();
+        context.lineWidth = 3;
+        context.strokeStyle = '#003300';
+        context.stroke();
+      }
+
+      function connect(url, oldws) {
         statusline.innerHTML = "connecting..."
-        ws = new WebSocket(url);
+        var ws = new WebSocket(url);
 
         //send coordinates to server on click/tap
         function click(e) {
           ws.send(JSON.stringify({ x: e.clientX, y: e.clientY }));
         }
-        canvas.addEventListener("mouseup", click, false);
 
         //draw circle upon message from server
         ws.onmessage = function(event) {
-          statusline.innerHTML = 'connection #' + numconnections + ' ' +  event.data
+          statusline.innerHTML = 'connection #' + numconns + ' ' + event.data;
           var msg = JSON.parse(event.data);
-          context.beginPath();
-          context.arc(msg.x, msg.y, msg.radius || 20, 0, 2 * Math.PI, false);
-          context.fillStyle = msg.color || 'blue';
-          context.fill();
-          context.lineWidth = 3;
-          context.strokeStyle = '#003300';
-          context.stroke();
+          circle(msg.x, msg.y, msg.radius || 20, msg.color || 'blue');
         };
 
-        //reconnect to server upon connection loss
-        ws.onerror = function(){
-          canvas.removeEventListener("mouseup", click, false);
-          setTimeout(function(){ init(url) }, 1000);
-        };
-
-        //close & reconnect web socket after 10 seconds
-        ws.onopen = function() {
-          statusline.innerHTML = 'connection #' + ++numconnections
-          setTimeout(function() {
-            canvas.removeEventListener("mouseup", click, false);
-            ws.close();
-            init(url);
-          }, 10000)
+        //function to reconnect web socket
+        function reconnectafter(msec) {
+          clearTimeout(reconnecttimeout);
+          reconnecttimeout = setTimeout(() => { connect(url, ws) }, msec);
         }
+
+        //set status message, register click handler and close old socket
+        ws.onopen = function() {
+          statusline.innerHTML = 'connection #' + ++numconns;
+          canvas.addEventListener("mouseup", click, false);
+          reconnectafter(10000);
+          if (oldws) oldws.close();
+        }
+
+        //remove mouseup handler when connection is closed
+        ws.onclose = function() {
+          canvas.removeEventListener("mouseup", click, false);
+        };
+
+        //reconnect to server upon connection loss with 1 sec delay
+        ws.onerror = function() {
+          reconnectafter(1000);
+        };
       }
-      init('ws://' + window.location.host + '/')
+      connect('ws://' + window.location.host + '/')
     </script>
   </body>
 </html>

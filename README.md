@@ -7,83 +7,90 @@ $ oc process -f clickgame.yaml | oc create -f -
 ```
 
 ## Demonstrate App structure
-* **server.js** is a simple express application to serve static content
+* **server.js** is a simple express application to serve static content,
+containing some javascript code to draw a circle on a canvas.
 * **public/index.html** is the static HTML page being served
 
 ## Adjust client (index.html)
 Executing these changes will yield [result/index.html](result/index.html).
 
-1. Replace the &lt;h1> element with the following snippet. This creates a canvas that can be used to draw on and opens a web socket back to the server:
+1. Remove the &lt;h1> element
+2. Add to the JavaScript to open a web socket back to the server:
 ```
-<div id="status"></div>
-<canvas id="canvas"></canvas>
-<script>
-  var statusline = document.getElementById('status');
-  var numconnections = 0;
+function connect(url, oldws) {
+  statusline.innerHTML = "connecting..."
+  var ws = new WebSocket(url);
 
-  var canvas = document.getElementById('canvas');
-  canvas.width = document.body.clientWidth;
-  canvas.height = document.body.clientHeight;
-  var context = canvas.getContext('2d');
-
-  function init(url){
-    statusline.innerHTML = "connecting..."
-    ws = new WebSocket(url);
-
-    // additional code here
-  }
-  init('ws://' + window.location.host + '/')
-</script>
+  //additional code here
+}
+connect('ws://' + window.location.host + '/')
 ```
 
-2. Send click coordinates to the server (add directly below ```// additional code here``` ):
+2. Send click coordinates to the server
+(add everything in the connect function, after ```//additional code here ``` ):
 ```
 //send coordinates to server on click/tap
 function click(e) {
   ws.send(JSON.stringify({ x: e.clientX, y: e.clientY }));
 }
-canvas.addEventListener("mouseup", click, false);
 ```
 
-3. When message is received via websocket, draw a circle with the specified coordinates, radius and color:
+3. When message is received via websocket,
+draw a circle with the specified coordinates, radius and color:
 ```
 //draw circle upon message from server
 ws.onmessage = function(event) {
-  statusline.innerHTML = 'connection #' + numconnections + ' ' +  event.data
+  statusline.innerHTML = 'connection #' + numconns + ' ' + event.data;
   var msg = JSON.parse(event.data);
-  context.beginPath();
-  context.arc(msg.x, msg.y, msg.radius || 20, 0, 2 * Math.PI, false);
-  context.fillStyle = msg.color || 'blue';
-  context.fill();
-  context.lineWidth = 3;
-  context.strokeStyle = '#003300';
-  context.stroke();
+  circle(msg.x, msg.y, msg.radius || 20, msg.color || 'blue');
 };
 ```
 
-4. Ensure websocket is periodically reset and reinitated on error:
+4. Create function to reconnect web socket:
 ```
-//reconnect to server upon connection loss
-ws.onerror = function(){
-  canvas.removeEventListener("mouseup", click, false);
-  setTimeout(function(){ init(url) }, 1000);
-};
-
-//close & reconnect web socket after 10 seconds
-ws.onopen = function() {
-  statusline.innerHTML = 'connection #' + ++numconnections
-  setTimeout(function() {
-    canvas.removeEventListener("mouseup", click, false);
-    ws.close();
-    init(url);
-  }, 10000)
+//function to reconnect web socket
+function reconnectafter(msec) {
+  clearTimeout(reconnecttimeout);
+  reconnecttimeout = setTimeout(() => { connect(url, ws) }, msec);
 }
+```
+
+5. When socket is opened successfully:
+notify user,
+add event handler to handle clicks,
+set timeout to reconnect after 10 seconds and
+close old socket if necessary
+```
+//set status message, register click handler and close old socket
+ws.onopen = function() {
+  statusline.innerHTML = 'connection #' + ++numconns;
+  canvas.addEventListener("mouseup", click, false);
+  reconnectafter(10000);
+  if (oldws) oldws.close();
+}
+```
+
+6. Remove mouseup handler when connection is closed
+```
+//remove mouseup handler when connection is closed
+ws.onclose = function() {
+  canvas.removeEventListener("mouseup", click, false);
+};
+```
+
+7. Reconnect to server upon connection loss with 1 sec delay
+```
+//reconnect to server upon connection loss with 1 sec delay
+ws.onerror = function() {
+  reconnectafter(1000);
+};
 ```
 
 ## Adjust server (server.js)
 Executing these changes will yield [result/server.js](result/server.js).
 
-1. Create websocket server and stomp connection to message broker (add after existing code):
+1. Create websocket server and stomp connection to message broker
+(add after existing code):
 ```
 const SocketServer = require('ws').Server;
 const wss = new SocketServer({ server });
@@ -106,7 +113,8 @@ stompit.connect(stompconnection, (err, stompclient) => {
 });
 ```
 
-2. Subscribe to topic and forward all publications to websocket clients (below ```// additional code here``` ):
+2. Subscribe to topic and forward all publications to websocket clients
+(below ```// additional code here``` ):
 ```
 //subscribe to topic and send to all websocket clients
 stompclient.subscribe(topic, (err, msg) => {
@@ -146,7 +154,10 @@ process.on('exit', function () { //on 'SIGTERM'
 ```
 $ oc start-build clickgame-blue --from-dir=.
 ```
-2. Demonstrate the created application - all users should be able to jointly create blue circles by clicking on the canvas.
+
+2. Demonstrate the created application -
+all users should be able to jointly create blue circles
+by clicking on the canvas.
 
 ## Build 'green' application & adjust route
 1. Adjust the message to be published (under ```//adjust message here``` ):
