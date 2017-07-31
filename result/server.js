@@ -18,16 +18,16 @@ const stompconnection = {
     passcode: process.env.AMQ_PASSWORD
   }
 }
-const topic = { destination: '/topic/SampleTopic' };
 
 stompit.connect(stompconnection, (err, stompclient) => {
   if (err) console.log(err);
 
   //subscribe to topic and send to all websocket clients
+  const topic = { destination: '/topic/SampleTopic' }
   stompclient.subscribe(topic, (err, msg) => {
     msg.readString('UTF-8', (err, body) => {
       console.log('sending: %s', body);
-      wss.clients.forEach((websocketclient) => { websocketclient.send(body); });
+      wss.clients.forEach((wsclient) => { wsclient.send(body); });
     });
   });
 
@@ -35,7 +35,8 @@ stompit.connect(stompconnection, (err, stompclient) => {
   wss.on('connection', (ws) => {
     console.log('Client connected');
     ws.on('close', () => console.log('Client disconnected'));
-    ws.on('message', function incoming(msg) {
+
+    ws.on('message', (msg) => {
       console.log('received: %s', msg);
 
       // adjust message here
@@ -50,7 +51,5 @@ stompit.connect(stompconnection, (err, stompclient) => {
   });
 
   //cleanup on exit
-  process.on('exit', function () {
-    stompclient.disconnect();
-  });
+  process.on('exit', () => { stompclient.disconnect() });
 });

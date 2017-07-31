@@ -14,7 +14,7 @@ containing some javascript code to draw a circle on a canvas.
 ## Adjust client (index.html)
 Executing these changes will yield [result/index.html](result/index.html).
 
-1. Remove the &lt;h1> element
+1. Remove the &lt;h1> element.
 2. Add to the JavaScript to open a web socket back to the server:
 ```
 function connect(url, oldws) {
@@ -43,7 +43,7 @@ ws.onmessage = function(event) {
   statusline.innerHTML = 'connection #' + numconns + ' ' + event.data;
   var msg = JSON.parse(event.data);
   circle(msg.x, msg.y, msg.radius || 20, msg.color || 'blue');
-};
+}
 ```
 
 4. Create function to reconnect web socket:
@@ -75,7 +75,7 @@ ws.onopen = function() {
 //remove mouseup handler when connection is closed
 ws.onclose = function() {
   canvas.removeEventListener("mouseup", click, false);
-};
+}
 ```
 
 7. Reconnect to server upon connection loss with 1 sec delay
@@ -83,18 +83,21 @@ ws.onclose = function() {
 //reconnect to server upon connection loss with 1 sec delay
 ws.onerror = function() {
   reconnectafter(1000);
-};
+}
 ```
 
 ## Adjust server (server.js)
 Executing these changes will yield [result/server.js](result/server.js).
 
-1. Create websocket server and stomp connection to message broker
+1. Create websocket server
 (add after existing code):
 ```
 const SocketServer = require('ws').Server;
 const wss = new SocketServer({ server });
+```
 
+2. Create  stomp connection to message broker
+```
 const stompit = require('stompit');
 const stompconnection = {
   host: 'broker-amq-stomp',
@@ -104,7 +107,6 @@ const stompconnection = {
     passcode: process.env.AMQ_PASSWORD
   }
 }
-const topic = { destination: '/topic/SampleTopic' };
 
 stompit.connect(stompconnection, (err, stompclient) => {
   if (err) console.log(err);
@@ -113,40 +115,46 @@ stompit.connect(stompconnection, (err, stompclient) => {
 });
 ```
 
-2. Subscribe to topic and forward all publications to websocket clients
+3. Subscribe to topic and forward all publications to websocket clients
 (below ```// additional code here``` ):
 ```
 //subscribe to topic and send to all websocket clients
+const topic = { destination: '/topic/SampleTopic' }
 stompclient.subscribe(topic, (err, msg) => {
   msg.readString('UTF-8', (err, body) => {
     console.log('sending: %s', body);
-    wss.clients.forEach((websocketclient) => { websocketclient.send(body); });
+    wss.clients.forEach((wsclient) => { wsclient.send(body); });
   });
 });
 ```
 
-3. Publish messages from websocket to topic:
+4. Publish messages from websocket to topic:
 ```
 //publish new messages from websocket to topic
 wss.on('connection', (ws) => {
   console.log('Client connected');
   ws.on('close', () => console.log('Client disconnected'));
-  ws.on('message', function incoming(msg) {
-    console.log('received: %s', msg);
-    // adjust message here
-    const frame = stompclient.send(topic);
-    frame.write(msg);
-    frame.end();
-  });
+
+  //additional code here 2
 });
 ```
 
-4. Ensure cleanup on exit:
+5. When websocket message is received, publish it
+(add under ```//additional code here 2``` ):
+```
+ws.on('message', (msg) => {
+  console.log('received: %s', msg);
+  // adjust message here
+  const frame = stompclient.send(topic);
+  frame.write(msg);
+  frame.end();
+});
+```
+
+6. Ensure cleanup on exit (add on global level):
 ```
 //cleanup on exit
-process.on('exit', function () { //on 'SIGTERM'
-  stompclient.disconnect();
-});
+process.on('exit', () => { stompclient.disconnect() });
 ```
 
 ## Rebuild & demonstrate 'blue' application
