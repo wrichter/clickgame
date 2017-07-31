@@ -151,7 +151,7 @@ ws.on('message', (msg) => {
 });
 ```
 
-6. Ensure cleanup on exit (add on global level):
+6. Ensure cleanup on exit (add on stompclient level):
 ```
 //cleanup on exit
 process.on('exit', () => { stompclient.disconnect() });
