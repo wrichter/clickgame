@@ -182,7 +182,7 @@ $ oc start-build clickgame-green --from-dir=.
 
 3. Switch from 'blue' to 'green':
 ```
-$ oc patch route clickgame -p \ '{"spec":{"to":{"name":"clickgame-green"}},"alternateBackends":[]}'
+$ oc patch route clickgame -p '{"spec":{"to":{"name":"clickgame-green"}},"alternateBackends":[]}'
 ```
 
 4. Change route weights to 50% blue/50% green:
