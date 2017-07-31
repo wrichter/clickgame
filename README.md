@@ -1,5 +1,30 @@
 # Instructions
 
+## Overview
+Key idea of this demo is to use a publicly accessible OpenShift instance where the audience can interact with the application while changes are being made. This is a simple game that allows all users to draw circles on a shared canvas by tapping on the canvas.
+
+The application consists of a browser UI capturing user clicks and drawing circles on behalf of the servers request. Multiple servers can modify messages on the fly and exchange messages among each other via a pub/sub broker.
+
+The architecture looks as follows:
+```
++-------+
+|browser+--+
++-------+  |  +------+
+           +--+server+--+
++-------+  |  +------+  |
+|browser+--+            |
++-------+               |  +------+
+                        +--+broker|
++-------+               |  +------+
+|browser+--+            |
++-------+  |  +------+  |
+           +--+server+--+
++-------+  |  +------+
+|browser+--+
++-------+
+```
+
+
 ## Instantiate clickgame in namespace
 ```
 $ oc new-project clickgame
