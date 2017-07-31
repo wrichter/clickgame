@@ -185,14 +185,16 @@ $ oc start-build clickgame-green --from-dir=.
 $ oc patch route clickgame -p '{"spec":{"to":{"name":"clickgame-green"}}}'
 ```
 
-4. Change route weights to 50% blue/50% green:
+4. Continue creating circles, all circles should now be blue.
+
+5. Change route weights to 50% blue/50% green:
 ```
 $ oc patch route clickgame -p \
 '{"spec":{"to":{"name":"clickgame-blue","weight":50},
 "alternateBackends":[{"name":"clickgame-green","weight":50,"kind":"Service"}]}}'
 ```
 
-5. Continue creating circles, 50% should now be blue and 50% should be green.
+6. Continue creating circles, 50% should now be blue and 50% should be green.
 
 ## Reset Demo
 1. ```git checkout public/index.html server.js```
