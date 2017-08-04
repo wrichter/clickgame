@@ -44,8 +44,7 @@ Executing these changes will yield [result/index.html](result/index.html).
 
 1. (Optional) you may want to add the following sequence of comments to the
 JavaScript code. This will explain the flow of the code, each line can then be
-augmented/replaced by the actual code:
-```// create websocket
+augmented/replaced by the actual code:```// create websocket
 // function to reconnect web socket
 // function to send coordinates to server
 // when a message is received from the server, draw a circle
