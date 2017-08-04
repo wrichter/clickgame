@@ -69,13 +69,13 @@ augmented/replaced by the actual code:
     connect('ws://' + window.location.host + '/')
     ```
 
-1. Create function to reconnect web socket:```
-// function to reconnect web socket
-function reconnectafter(msec) {
-  clearTimeout(reconnecttimeout);
-  reconnecttimeout = setTimeout(() => { connect(url, ws) }, msec);
-}
-```
+1. Create function to reconnect web socket:
+    ```// function to reconnect web socket
+    function reconnectafter(msec) {
+      clearTimeout(reconnecttimeout);
+      reconnecttimeout = setTimeout(() => { connect(url, ws) }, msec);
+    }
+    ```
 
 1. Send click coordinates to the server
 (add everything in the connect function,
