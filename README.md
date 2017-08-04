@@ -44,8 +44,7 @@ Executing these changes will yield [result/index.html](result/index.html).
 
 1. (Optional) you may want to add the following sequence of comments to the
 JavaScript code. This will explain the flow of the code, each line can then be
-augmented/replaced by the actual code:
-```
+augmented/replaced by the actual code:```
 // create websocket
 // function to reconnect web socket
 // function to send coordinates to server
@@ -59,8 +58,7 @@ augmented/replaced by the actual code:
 // when connection is lost, reconnect to server
 ```
 
-1. Add to the JavaScript to open a web socket back to the server:
-```
+1. Add to the JavaScript to open a web socket back to the server:```
 // create websocket
 function connect(url, oldws) {
   statusline.innerHTML = "connecting..."
@@ -71,8 +69,7 @@ function connect(url, oldws) {
 connect('ws://' + window.location.host + '/')
 ```
 
-1. Create function to reconnect web socket:
-```
+1. Create function to reconnect web socket:```
 // function to reconnect web socket
 function reconnectafter(msec) {
   clearTimeout(reconnecttimeout);
@@ -81,8 +78,8 @@ function reconnectafter(msec) {
 ```
 
 1. Send click coordinates to the server
-(add everything in the connect function, after ```//additional code here ``` ):
-```
+(add everything in the connect function,
+after ```//additional code here ``` ):```
 // function to send coordinates to server
 function click(e) {
   ws.send(JSON.stringify({ x: e.clientX, y: e.clientY }));
@@ -90,8 +87,7 @@ function click(e) {
 ```
 
 1. When message is received via websocket,
-draw a circle with the specified coordinates, radius and color:
-```
+draw a circle with the specified coordinates, radius and color:```
 // draw circle upon message from server
 ws.onmessage = function(event) {
   statusline.innerHTML = 'connection #' + numconns + ' ' + event.data;
@@ -104,8 +100,7 @@ ws.onmessage = function(event) {
 notify user,
 add event handler to handle clicks,
 set timeout to reconnect after 10 seconds and
-close old socket if necessary
-```
+close old socket if necessary:```
 // when web socket is connected...
 // ...set status message,
 // ...start sending clicks to server,
@@ -119,16 +114,14 @@ ws.onopen = function() {
 }
 ```
 
-1. Remove mouseup handler when connection is closed
-```
+1. Remove mouseup handler when connection is closed:```
 // stop sending clicks to server when connection is closed
 ws.onclose = function() {
   canvas.removeEventListener("mouseup", click, false);
 }
 ```
 
-1. Reconnect to server upon connection loss with 1 sec delay
-```
+1. Reconnect to server upon connection loss with 1 sec delay:```
 // reconnect to server upon connection loss
 ws.onerror = function() {
   reconnectafter(1000);
@@ -140,8 +133,7 @@ Executing these changes will yield [result/server.js](result/server.js).
 
 1. (Optional) you may want to add the following sequence of comments to the
 JavaScript code. This will explain the flow of the code, each line can then be
-augmented/replaced by the actual code:
-```
+augmented/replaced by the actual code:```
 // create websocket server
 // create pub/sub broker connection
 // subscribe to topic on broker and forward any message to websocket clients
@@ -152,15 +144,13 @@ augmented/replaced by the actual code:
 ```
 
 1. Create websocket server
-(add after existing code):
-```
+(add after existing code):```
 // create websocket server
 const SocketServer = require('ws').Server;
 const wss = new SocketServer({ server });
 ```
 
-1. Create  stomp connection to message broker:
-```
+1. Create  stomp connection to message broker:```
 // create pub/sub broker connection
 const stompit = require('stompit');
 const stompconnection = {
@@ -180,8 +170,7 @@ stompit.connect(stompconnection, (err, stompclient) => {
 ```
 
 1. Subscribe to topic and forward all publications to websocket clients
-(below ```// additional code here``` ):
-```
+(below ```// additional code here``` ):```
 // subscribe to topic on broker and forward any message to websocket clients
 const topic = { destination: '/topic/SampleTopic' }
 stompclient.subscribe(topic, (err, msg) => {
@@ -192,8 +181,7 @@ stompclient.subscribe(topic, (err, msg) => {
 });
 ```
 
-1. Publish messages from websocket to topic:
-```
+1. Publish messages from websocket to topic:```
 // when broker connection is established...
 wss.on('connection', (ws) => {
   console.log('Client connected');
@@ -204,9 +192,7 @@ wss.on('connection', (ws) => {
 ```
 
 1. When websocket message is received, publish it
-(add under ```//additional code here 2``` ):
-```
-
+(add under ```//additional code here 2``` ):```
 // ...start publishing new messages from websocket to topic on broker
 ws.on('message', (msg) => {
   console.log('received: %s', msg);
@@ -217,15 +203,13 @@ ws.on('message', (msg) => {
 });
 ```
 
-1. Ensure cleanup on exit (add on stompclient level):
-```
+1. Ensure cleanup on exit (add on stompclient level):```
 // when the process exits, clean up
 process.on('exit', () => { stompclient.disconnect() });
 ```
 
 ## Rebuild & demonstrate 'blue' application
-1. Rebuild 'blue' application from current source code:
-```
+1. Rebuild 'blue' application from current source code:```
 $ oc start-build clickgame-blue --from-dir=.
 ```
 
@@ -234,27 +218,23 @@ all users should be able to jointly create blue circles
 by clicking on the canvas.
 
 ## Build 'green' application & adjust route
-1. Adjust the message to be published (under ```//adjust message here``` ):
-```
+1. Adjust the message to be published (under ```//adjust message here``` ):```
 var o = JSON.parse(msg);
 o.color = 'green';
 msg = JSON.stringify(o);
 ```
 
-1. Build 'green' application from current source code:
-```
+1. Build 'green' application from current source code:```
 $ oc start-build clickgame-green --from-dir=.
 ```
 
-1. Switch from 'blue' to 'green':
-```
+1. Switch from 'blue' to 'green':```
 $ oc patch route clickgame -p '{"spec":{"to":{"name":"clickgame-green"}}}'
 ```
 
 1. Continue creating circles, all circles should now be blue.
 
-1. Change route weights to 50% blue/50% green:
-```
+1. Change route weights to 50% blue/50% green:```
 $ oc patch route clickgame -p \
 '{"spec":{"to":{"name":"clickgame-blue","weight":50},
 "alternateBackends":[{"name":"clickgame-green","weight":50,"kind":"Service"}]}}'
