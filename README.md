@@ -44,7 +44,8 @@ Executing these changes will yield [result/index.html](result/index.html).
 
 1. (Optional) you may want to add the following sequence of comments to the
 JavaScript code. This will explain the flow of the code, each line can then be
-augmented/replaced by the actual code:```
+augmented/replaced by the actual code:
+```
 // create websocket
 // function to reconnect web socket
 // function to send coordinates to server
@@ -57,8 +58,8 @@ augmented/replaced by the actual code:```
 // when connection is closed, stop sending clicks to server
 // when connection is lost, reconnect to server
 ```
-
-1. Add to the JavaScript to open a web socket back to the server:```
+1. Add to the JavaScript to open a web socket back to the server:
+```
 // create websocket
 function connect(url, oldws) {
   statusline.innerHTML = "connecting..."
