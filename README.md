@@ -83,7 +83,8 @@ augmented/replaced by the actual code:
 1. Send click coordinates to the server
 (add everything in the connect function,
 after ```//additional code here ``` ):
-    ```// function to send coordinates to server
+    ```
+    // function to send coordinates to server
     function click(e) {
       ws.send(JSON.stringify({ x: e.clientX, y: e.clientY }));
     }
@@ -91,7 +92,8 @@ after ```//additional code here ``` ):
 
 1. When message is received via websocket,
 draw a circle with the specified coordinates, radius and color:
-    ```// draw circle upon message from server
+    ```
+    // draw circle upon message from server
     ws.onmessage = function(event) {
       statusline.innerHTML = 'connection #' + numconns + ' ' + event.data;
       var msg = JSON.parse(event.data);
@@ -104,7 +106,8 @@ notify user,
 add event handler to handle clicks,
 set timeout to reconnect after 10 seconds and
 close old socket if necessary:
-    ```// when web socket is connected...
+    ```
+    // when web socket is connected...
     // ...set status message,
     // ...start sending clicks to server,
     // ...start reconnect timer and
@@ -118,14 +121,16 @@ close old socket if necessary:
     ```
 
 1. Remove mouseup handler when connection is closed:
-    ```// stop sending clicks to server when connection is closed
+    ```
+    // stop sending clicks to server when connection is closed
     ws.onclose = function() {
       canvas.removeEventListener("mouseup", click, false);
     }
     ```
 
 1. Reconnect to server upon connection loss with 1 sec delay:
-    ```// reconnect to server upon connection loss
+    ```
+    // reconnect to server upon connection loss
     ws.onerror = function() {
       reconnectafter(1000);
     }
@@ -137,7 +142,8 @@ Executing these changes will yield [result/server.js](result/server.js).
 1. (Optional) you may want to add the following sequence of comments to the
 JavaScript code. This will explain the flow of the code, each line can then be
 augmented/replaced by the actual code:
-    ```// create websocket server
+    ```
+    // create websocket server
     // create pub/sub broker connection
     // subscribe to topic on broker and forward any message to websocket clients
     // publish new messages from websocket to topic on broker
@@ -155,7 +161,8 @@ augmented/replaced by the actual code:
     ```
 
 1. Create  stomp connection to message broker:
-    ```// create pub/sub broker connection
+    ```
+    // create pub/sub broker connection
     const stompit = require('stompit');
     const stompconnection = {
       host: 'broker-amq-stomp',
@@ -175,7 +182,8 @@ augmented/replaced by the actual code:
 
 1. Subscribe to topic and forward all publications to websocket clients
 (below ```// additional code here``` ):
-    ```// subscribe to topic on broker and forward any message to websocket clients
+    ```
+    // subscribe to topic on broker and forward any message to websocket clients
     const topic = { destination: '/topic/SampleTopic' }
     stompclient.subscribe(topic, (err, msg) => {
       msg.readString('UTF-8', (err, body) => {
@@ -186,7 +194,8 @@ augmented/replaced by the actual code:
     ```
 
 1. Publish messages from websocket to topic:
-    ```// when broker connection is established...
+    ```
+    // when broker connection is established...
     wss.on('connection', (ws) => {
       console.log('Client connected');
       ws.on('close', () => console.log('Client disconnected'));
@@ -197,7 +206,8 @@ augmented/replaced by the actual code:
 
 1. When websocket message is received, publish it
 (add under ```//additional code here 2``` ):
-    ```// ...start publishing new messages from websocket to topic on broker
+    ```
+    // ...start publishing new messages from websocket to topic on broker
     ws.on('message', (msg) => {
       console.log('received: %s', msg);
       // adjust message here
@@ -208,13 +218,15 @@ augmented/replaced by the actual code:
     ```
 
 1. Ensure cleanup on exit (add on stompclient level):
-    ```// when the process exits, clean up
+    ```
+    // when the process exits, clean up
     process.on('exit', () => { stompclient.disconnect() });
     ```
 
 ## Rebuild & demonstrate 'blue' application
 1. Rebuild 'blue' application from current source code:
-    ```$ oc start-build clickgame-blue --from-dir=.
+    ```
+    $ oc start-build clickgame-blue --from-dir=.
     ```
 
 1. Demonstrate the created application -
@@ -223,23 +235,27 @@ by clicking on the canvas.
 
 ## Build 'green' application & adjust route
 1. Adjust the message to be published (under ```//adjust message here``` ):
-    ```var o = JSON.parse(msg);
+    ```
+    var o = JSON.parse(msg);
     o.color = 'green';
     msg = JSON.stringify(o);
     ```
 
 1. Build 'green' application from current source code:
-    ```oc start-build clickgame-green --from-dir=.
+    ```
+    $ oc start-build clickgame-green --from-dir=.
     ```
 
 1. Switch from 'blue' to 'green':
-    ```oc patch route clickgame -p '{"spec":{"to":{"name":"clickgame-green"}}}'
+    ```
+    $ oc patch route clickgame -p '{"spec":{"to":{"name":"clickgame-green"}}}'
     ```
 
 1. Continue creating circles, all circles should now be blue.
 
 1. Change route weights to 50% blue/50% green:
-    ```$ oc patch route clickgame -p \
+    ```
+    $ oc patch route clickgame -p \
     '{"spec":{"to":{"name":"clickgame-blue","weight":50},
     "alternateBackends":[{"name":"clickgame-green","weight":50,"kind":"Service"}]}}'
     ```
@@ -247,5 +263,5 @@ by clicking on the canvas.
 1. Continue creating circles, 50% should now be blue and 50% should be green.
 
 ## Reset Demo
-1. ```$ git checkout public/index.html server.js```
-1. ``` $ oc delete all,templates --all```
+1. `$ git checkout public/index.html server.js`
+1. `$ oc delete all,templates --all`
