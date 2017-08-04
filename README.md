@@ -45,7 +45,8 @@ Executing these changes will yield [result/index.html](result/index.html).
 1. (Optional) you may want to add the following sequence of comments to the
 JavaScript code. This will explain the flow of the code, each line can then be
 augmented/replaced by the actual code:
-    ```// create websocket
+    ```
+    // create websocket
     // function to reconnect web socket
     // function to send coordinates to server
     // when a message is received from the server, draw a circle
@@ -59,7 +60,8 @@ augmented/replaced by the actual code:
     ```
 
 1. Add to the JavaScript to open a web socket back to the server:
-    ```// create websocket
+    ```
+    // create websocket
     function connect(url, oldws) {
       statusline.innerHTML = "connecting..."
       var ws = new WebSocket(url);
@@ -70,7 +72,8 @@ augmented/replaced by the actual code:
     ```
 
 1. Create function to reconnect web socket:
-    ```// function to reconnect web socket
+    ```
+    // function to reconnect web socket
     function reconnectafter(msec) {
       clearTimeout(reconnecttimeout);
       reconnecttimeout = setTimeout(() => { connect(url, ws) }, msec);
@@ -145,7 +148,8 @@ augmented/replaced by the actual code:
 
 1. Create websocket server
 (add after existing code):
-    ```// create websocket server
+    ```
+    // create websocket server
     const SocketServer = require('ws').Server;
     const wss = new SocketServer({ server });
     ```
@@ -225,11 +229,11 @@ by clicking on the canvas.
     ```
 
 1. Build 'green' application from current source code:
-    ```$ oc start-build clickgame-green --from-dir=.
+    ```oc start-build clickgame-green --from-dir=.
     ```
 
 1. Switch from 'blue' to 'green':
-    ```$ oc patch route clickgame -p '{"spec":{"to":{"name":"clickgame-green"}}}'
+    ```oc patch route clickgame -p '{"spec":{"to":{"name":"clickgame-green"}}}'
     ```
 
 1. Continue creating circles, all circles should now be blue.
