@@ -146,7 +146,6 @@ augmented/replaced by the actual code:
     // create websocket server
     // create pub/sub broker connection
     // subscribe to topic on broker and forward any message to websocket clients
-    // publish new messages from websocket to topic on broker
     // when broker connection is established...
     // ...start publishing new messages from websocket to topic on broker
     // when the process exits, clean up
