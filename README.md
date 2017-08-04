@@ -93,7 +93,7 @@ after ```//additional code here ``` ):
 1. When message is received via websocket,
 draw a circle with the specified coordinates, radius and color:
     ```
-    // draw circle upon message from server
+    // when a message is received from the server, draw a circle
     ws.onmessage = function(event) {
       statusline.innerHTML = 'connection #' + numconns + ' ' + event.data;
       var msg = JSON.parse(event.data);
@@ -122,7 +122,7 @@ close old socket if necessary:
 
 1. Remove mouseup handler when connection is closed:
     ```
-    // stop sending clicks to server when connection is closed
+    // when connection is closed, stop sending clicks to server
     ws.onclose = function() {
       canvas.removeEventListener("mouseup", click, false);
     }
@@ -130,7 +130,7 @@ close old socket if necessary:
 
 1. Reconnect to server upon connection loss with 1 sec delay:
     ```
-    // reconnect to server upon connection loss
+    // when connection is lost, reconnect to server
     ws.onerror = function() {
       reconnectafter(1000);
     }
