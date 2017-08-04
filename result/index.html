@@ -26,29 +26,34 @@
         context.stroke();
       }
 
+      // create websocket
       function connect(url, oldws) {
         statusline.innerHTML = "connecting..."
         var ws = new WebSocket(url);
 
-        //send coordinates to server on click/tap
+        // function to reconnect web socket
+        function reconnectafter(msec) {
+          clearTimeout(reconnecttimeout);
+          reconnecttimeout = setTimeout(() => { connect(url, ws) }, msec);
+        }
+
+        // function to send coordinates to server
         function click(e) {
           ws.send(JSON.stringify({ x: e.clientX, y: e.clientY }));
         }
 
-        //draw circle upon message from server
+        // draw circle upon message from server
         ws.onmessage = function(event) {
           statusline.innerHTML = 'connection #' + numconns + ' ' + event.data;
           var msg = JSON.parse(event.data);
           circle(msg.x, msg.y, msg.radius || 20, msg.color || 'blue');
         };
 
-        //function to reconnect web socket
-        function reconnectafter(msec) {
-          clearTimeout(reconnecttimeout);
-          reconnecttimeout = setTimeout(() => { connect(url, ws) }, msec);
-        }
-
-        //set status message, register click handler and close old socket
+        // when web socket is connected...
+        // ...set status message,
+        // ...start sending clicks to server,
+        // ...start reconnect timer and
+        // ...close old socket
         ws.onopen = function() {
           statusline.innerHTML = 'connection #' + ++numconns;
           canvas.addEventListener("mouseup", click, false);
@@ -56,12 +61,12 @@
           if (oldws) oldws.close();
         }
 
-        //remove mouseup handler when connection is closed
+        // stop sending clicks to server when connection is closed
         ws.onclose = function() {
           canvas.removeEventListener("mouseup", click, false);
         };
 
-        //reconnect to server upon connection loss with 1 sec delay
+        // reconnect to server upon connection loss
         ws.onerror = function() {
           reconnectafter(1000);
         };

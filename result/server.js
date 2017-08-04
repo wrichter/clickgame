@@ -6,9 +6,11 @@ const server = express()
   .use(express.static('public'))
   .listen(PORT, () => console.log(`Listening on ${ PORT }`));
 
+// create websocket server
 const SocketServer = require('ws').Server;
 const wss = new SocketServer({ server });
 
+// create pub/sub broker connection
 const stompit = require('stompit');
 const stompconnection = {
   host: 'broker-amq-stomp',
@@ -22,7 +24,7 @@ const stompconnection = {
 stompit.connect(stompconnection, (err, stompclient) => {
   if (err) console.log(err);
 
-  //subscribe to topic and send to all websocket clients
+  // subscribe to topic on broker and forward messages to websocket clients
   const topic = { destination: '/topic/SampleTopic' }
   stompclient.subscribe(topic, (err, msg) => {
     msg.readString('UTF-8', (err, body) => {
@@ -31,11 +33,12 @@ stompit.connect(stompconnection, (err, stompclient) => {
     });
   });
 
-  //publish new messages from websocket to topic
+  // when broker connection is established...
   wss.on('connection', (ws) => {
     console.log('Client connected');
     ws.on('close', () => console.log('Client disconnected'));
 
+    // ...start publishing new messages from websocket to topic on broker
     ws.on('message', (msg) => {
       console.log('received: %s', msg);
 
