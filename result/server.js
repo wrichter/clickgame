@@ -24,7 +24,7 @@ const stompconnection = {
 stompit.connect(stompconnection, (err, stompclient) => {
   if (err) console.log(err);
 
-  // subscribe to topic on broker and forward messages to websocket clients
+  // subscribe to topic on broker and forward any message to websocket clients
   const topic = { destination: '/topic/SampleTopic' }
   stompclient.subscribe(topic, (err, msg) => {
     msg.readString('UTF-8', (err, body) => {
@@ -33,7 +33,7 @@ stompit.connect(stompconnection, (err, stompclient) => {
     });
   });
 
-  // when broker connection is established...
+  // when websocket connection is established...
   wss.on('connection', (ws) => {
     console.log('Client connected');
     ws.on('close', () => console.log('Client disconnected'));
@@ -53,6 +53,6 @@ stompit.connect(stompconnection, (err, stompclient) => {
     });
   });
 
-  //cleanup on exit
+  // when the process exits, clean up
   process.on('exit', () => { stompclient.disconnect() });
 });

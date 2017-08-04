@@ -49,14 +49,14 @@ augmented/replaced by the actual code:
 // create websocket
 // function to reconnect web socket
 // function to send coordinates to server
-// draw circle upon message from server
+// when a message is received from the server, draw a circle
 // when web socket is connected...
 // ...set status message,
 // ...start sending clicks to server,
 // ...start reconnect timer and
 // ...close old socket
-// stop sending clicks to server when connection is closed
-// reconnect to server upon connection loss
+// when connection is closed, stop sending clicks to server
+// when connection is lost, reconnect to server
 ```
 
 1. Add to the JavaScript to open a web socket back to the server:
@@ -144,11 +144,11 @@ augmented/replaced by the actual code:
 ```
 // create websocket server
 // create pub/sub broker connection
-// subscribe to topic on broker and forward messages to websocket clients
+// subscribe to topic on broker and forward any message to websocket clients
 // publish new messages from websocket to topic on broker
 // when broker connection is established...
 // ...start publishing new messages from websocket to topic on broker
-//cleanup on exit
+// when the process exits, clean up
 ```
 
 1. Create websocket server
@@ -182,7 +182,7 @@ stompit.connect(stompconnection, (err, stompclient) => {
 1. Subscribe to topic and forward all publications to websocket clients
 (below ```// additional code here``` ):
 ```
-// subscribe to topic on broker and forward messages to websocket clients
+// subscribe to topic on broker and forward any message to websocket clients
 const topic = { destination: '/topic/SampleTopic' }
 stompclient.subscribe(topic, (err, msg) => {
   msg.readString('UTF-8', (err, body) => {
@@ -219,7 +219,7 @@ ws.on('message', (msg) => {
 
 1. Ensure cleanup on exit (add on stompclient level):
 ```
-//cleanup on exit
+// when the process exits, clean up
 process.on('exit', () => { stompclient.disconnect() });
 ```
 

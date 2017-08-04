@@ -42,7 +42,7 @@
           ws.send(JSON.stringify({ x: e.clientX, y: e.clientY }));
         }
 
-        // draw circle upon message from server
+        // when a message is received from the server, draw a circle
         ws.onmessage = function(event) {
           statusline.innerHTML = 'connection #' + numconns + ' ' + event.data;
           var msg = JSON.parse(event.data);
@@ -61,12 +61,12 @@
           if (oldws) oldws.close();
         }
 
-        // stop sending clicks to server when connection is closed
+        // when connection is closed, stop sending clicks to server
         ws.onclose = function() {
           canvas.removeEventListener("mouseup", click, false);
         };
 
-        // reconnect to server upon connection loss
+        // when connection is lost, reconnect to server
         ws.onerror = function() {
           reconnectafter(1000);
         };
