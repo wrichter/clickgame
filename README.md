@@ -79,12 +79,12 @@ function reconnectafter(msec) {
 
 1. Send click coordinates to the server
 (add everything in the connect function,
-after ```//additional code here ``` ):```
-// function to send coordinates to server
-function click(e) {
-  ws.send(JSON.stringify({ x: e.clientX, y: e.clientY }));
-}
-```
+after ```//additional code here ``` ):
+    ```// function to send coordinates to server
+    function click(e) {
+      ws.send(JSON.stringify({ x: e.clientX, y: e.clientY }));
+    }
+    ```
 
 1. When message is received via websocket,
 draw a circle with the specified coordinates, radius and color:
@@ -210,7 +210,7 @@ augmented/replaced by the actual code:
 
 ## Rebuild & demonstrate 'blue' application
 1. Rebuild 'blue' application from current source code:
-    ```$ oc start-build clickgame-blue --from-dir=.
+    ``` $ oc start-build clickgame-blue --from-dir=.
     ```
 
 1. Demonstrate the created application -
@@ -243,5 +243,5 @@ by clicking on the canvas.
 1. Continue creating circles, 50% should now be blue and 50% should be green.
 
 ## Reset Demo
-1. ```git checkout public/index.html server.js```
-1. ```oc delete all,templates --all```
+1. ```$ git checkout public/index.html server.js```
+1. ``` $ oc delete all,templates --all```
