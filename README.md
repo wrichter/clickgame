@@ -210,7 +210,7 @@ augmented/replaced by the actual code:
 
 ## Rebuild & demonstrate 'blue' application
 1. Rebuild 'blue' application from current source code:
-    ``` $ oc start-build clickgame-blue --from-dir=.
+    ```$ oc start-build clickgame-blue --from-dir=.
     ```
 
 1. Demonstrate the created application -
