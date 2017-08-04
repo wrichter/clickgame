@@ -36,15 +36,12 @@ $ oc process -f clickgame.yaml | oc create -f -
 containing some javascript code to draw a circle on a canvas.
 * **public/index.html** is the static HTML page being served
 
-
-## Adjust client (index.html)
-Executing these changes will yield [result/index.html](result/index.html).
-
-1. Remove the &lt;h1> element.
-
-1. (Optional) you may want to add the following sequence of comments to the
+## (Optional) Create comment outline
+You may want to add the following sequence of comments to the
 JavaScript code. This will explain the flow of the code, each line can then be
 augmented/replaced by the actual code:
+
+1. Client (index.html):
     ```
     // create websocket
     // function to reconnect web socket
@@ -58,6 +55,21 @@ augmented/replaced by the actual code:
     // when connection is closed, stop sending clicks to server
     // when connection is lost, reconnect to server
     ```
+
+1. Server (server.js)
+    ```
+    // create websocket server
+    // create pub/sub broker connection
+    // subscribe to topic on broker and forward any message to websocket clients
+    // when broker connection is established...
+    // ...start publishing new messages from websocket to topic on broker
+    // when the process exits, clean up
+    ```
+
+## Adjust client (index.html)
+Executing these changes will yield [result/index.html](result/index.html).
+
+1. Remove the &lt;h1> element.
 
 1. Add to the JavaScript to open a web socket back to the server:
     ```
@@ -138,18 +150,6 @@ close old socket if necessary:
 
 ## Adjust server (server.js)
 Executing these changes will yield [result/server.js](result/server.js).
-
-1. (Optional) you may want to add the following sequence of comments to the
-JavaScript code. This will explain the flow of the code, each line can then be
-augmented/replaced by the actual code:
-    ```
-    // create websocket server
-    // create pub/sub broker connection
-    // subscribe to topic on broker and forward any message to websocket clients
-    // when broker connection is established...
-    // ...start publishing new messages from websocket to topic on broker
-    // when the process exits, clean up
-    ```
 
 1. Create websocket server
 (add after existing code):
